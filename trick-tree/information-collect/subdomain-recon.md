@@ -1,0 +1,609 @@
+---
+description: 总结关于子域名信息收集的相关知识
+---
+
+# 子域名信息收集
+
+## 0x00 What is Subdomain
+
+主域名由两个或者以上的字母构成，中间由`.`隔开，整个域名只有一个`.` ，Subdomain是顶级域名（`.com` , `.top` , `.cn`），与之相同，还有三级域名，四级域名等，这些统称为子域名。
+
+我们将子域名收集分为主动收集和被动收集两部分，主动收集是指直接与目标产生流量交互的收集方式，被动收集是借助搜索引擎等收集方式。
+
+## 0x01 How to find it
+
+![xmind](https://echocipher.github.io/2019/07/24/Subdomain-Recon/xmind.png)
+
+### 字典爆破
+
+我们可以通过字典的收集，然后通过脚本的方式来收集子域名，比如我们可以写一个小程序，从字典中提取内容并进行拼接。
+
+#### 字典
+
+**Dns服务商**
+
+Dns服务商的字典是最准确有效的，先找到一份DNSPod公布的使用最多的子域名字典：
+
+[https://github.com/DNSPod/oh-my-free-data/blob/master/src/dnspod-top2000-sub-domains.txt](https://github.com/DNSPod/oh-my-free-data/blob/master/src/dnspod-top2000-sub-domains.txt)
+
+**通用字典**
+
+通过基础**组合**生成字典，再从大小和命中做取舍。
+
+| 组合方式 | 示例 | 备注 |
+| :--- | :--- | :--- |
+| 单字母 | f.fei.cn | 单字符比较常见 |
+| 单字母+单数字 | s1.feei.cn |  |
+| 双字母 | sd.feei.cn | 大多数为业务系统名称的首字母缩写 |
+| 双字母+单数字 | ss1.feei.cn |  |
+| 双字母+双数字 | ss01.feei.cn |  |
+| 三字母 | www.feei.cn | 部分业务系统名称为三个字母缩写 |
+| 单数字 | 1.feei.cn |  |
+| 双数字 | 11.feei.cn |  |
+| 三数字 | 666.feei.cn |  |
+
+通过**常见词组**生成的字典
+
+具有代表意义的中英文词组
+
+| 中文 | 英文 |
+| :--- | :--- |
+| fanyi.feei.cn | tranlate.feei.cn |
+| huiyuan.feei.cn | member.feei.cn |
+| tupian.feei.cn | picture.feei.cn |
+
+**同类爆破工具的字典**
+
+同类工具搜集了相应的字典，可以全部结合起来：
+
+> [subbrute: names\_small.txt](https://github.com/TheRook/subbrute/blob/master/names_small.txt)
+>
+> [subDomainsBrute: subnames\_full.txt](https://github.com/lijiejie/subDomainsBrute/blob/master/dict/subnames_full.txt)
+>
+> [dnsbrute: 53683.txt](https://github.com/Q2h1Cg/dnsbrute/blob/v2.0/dict/53683.txt)
+
+这里我提取了很多工具、网络上分享出来的字典，一共`3844910` 条，经过简单去重：
+
+```python
+with open('dict.txt','r') as fr:
+    result_list = set(fr.readlines())
+with open('result.txt','a') as fw:
+    for i in result_list:
+        fw.write(i)
+```
+
+最终得到`1853022` 条数据。
+
+### Dork
+
+通过搜索引擎进行谷歌语法收集
+
+```text
+site:xxx.com
+```
+
+可以使用`-` 去掉不想看的结果，例如`site:baidu.com - image.baidu.com`
+
+e.g.
+
+```text
+    百度: https://www.baidu.com/s?wd=site:feei.cn
+
+    Google: https://www.google.com.hk/search?q=site:feei.cn
+
+    Bing: https://www.bing.com/search?q=site:feei.cn
+
+    Yahoo: https://search.yahoo.com/search?p=site:feei.cn
+```
+
+补充命令：
+
+| 命令 | 示例 | 备注 |
+| :--- | :--- | :--- |
+| intitle | intitle:admin | 搜索网页标题中含有admin的页面 |
+| inurl | inurl:admin | 搜索网页链接中含有admin的页面 |
+| intext | intext:admin | 搜索网页`<body>` 标签中含有admin的页面 |
+| Index of/ |  | 直接进入网站首页下的所有文件和文件夹 |
+| filetype | filetype:pdf | 搜索指定后缀为pdf页面的内容 |
+| cache |  | 搜索Google里关于某些内容的缓存 |
+
+当我们获取某些子域名真实IP时，再进行
+
+`site:x.x.x.*`
+
+会有意想不到的结果。
+
+#### sublist3r
+
+集合了多种搜索引擎的接口。
+
+[https://github.com/aboul3la/Sublist3r](https://github.com/aboul3la/Sublist3r)
+
+![1563859164957](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563859164957.png)
+
+### Goole HTTPS证书透明度
+
+Google透明度报告中的[证书透明度项目](https://transparencyreport.google.com/https/certificates)是用来解决HTTPS证书系统的结构性缺陷，它能够让所有人查询各个网站的HTTPS证书信息，从而能发现签发了证书的子域名。
+
+[https://transparencyreport.google.com/https/certificates](https://transparencyreport.google.com/https/certificates)
+
+[https://scans.io/study/sonar.ssl](https://scans.io/study/sonar.ssl)
+
+[https://scans.io/study/sonar.moressl](https://scans.io/study/sonar.moressl)
+
+[https://censys.io/](https://censys.io/)
+
+[https://crt.sh/](https://crt.sh/)
+
+[https://developers.facebook.com/tools/ct/](https://developers.facebook.com/tools/ct/)
+
+这里有人写了一个工具
+
+[https://github.com/appsecco/bugcrowd-levelup-subdomain-enumeration](https://github.com/appsecco/bugcrowd-levelup-subdomain-enumeration)
+
+简化使用CT日志搜索引擎查找子域名的过程，在子域名枚举中使用CT的缺点是，在CT日志中找到的域名可能不再存在，因此它们不能被解析为IP地址。可以使用诸如massdns这样与CT日志结合的工具来快速识别可解析的域名
+
+### Dns
+
+#### 第三方服务聚合
+
+通过查询dns的一些解析记录，而很多第三方服务聚合了大量的DNS数据集
+
+[https://dnsdumpster.com/](https://dnsdumpster.com/)
+
+[https://opendata.rapid7.com/](https://opendata.rapid7.com/)
+
+[https://www.threatcrowd.org/](https://www.threatcrowd.org/)
+
+[https://viewdns.info/](https://viewdns.info/)
+
+[https://www.dnsdb.io/zh-cn/](https://www.dnsdb.io/zh-cn/)
+
+#### 暴力解析
+
+这里lijiejie也写了关于dns暴力解析的工具
+
+[https://github.com/lijiejie/subDomainsBrute](https://github.com/lijiejie/subDomainsBrute)
+
+![1563860976671](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563860976671.png)
+
+#### Nmap
+
+`nmap --script dns-brute baidu.com`
+
+### 全网IP扫描http端口
+
+当访问ip 的`80`端口或者`8080`端口时，如果遇到301跳转，可在header中获取域名信息，全网扫描结果如下：
+
+[https://scans.io/study/sonar.http](https://scans.io/study/sonar.http)
+
+### 爬虫
+
+利用爬虫工具，对页面中的结果进行提取
+
+#### Burpsuite
+
+![1563867836354](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867836354.png)
+
+#### pyspider
+
+[https://github.com/binux/pyspider](https://github.com/binux/pyspider)
+
+#### js爬虫
+
+**subjs**
+
+[https://github.com/lc/subjs](https://github.com/lc/subjs)
+
+**linkfinder**
+
+[https://github.com/GerbenJavado/LinkFinder](https://github.com/GerbenJavado/LinkFinder)
+
+### IP反查
+
+![1563867884485](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867884485.png)
+
+### 文件信息泄露
+
+#### crossdomain
+
+通过扫描`crossdomain.xml`文件
+
+![1563867852032](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867852032.png)
+
+#### 漏洞报告平台
+
+利用乌云镜像等漏洞报告平台，或者一些漏洞案例，可以暴露出一些企业域名信息。
+
+### 第三方网站
+
+#### Github
+
+`https://github.com/search?q="domain"&type=code`
+
+#### shodan
+
+[https://www.shodan.io/](https://www.shodan.io/)
+
+#### Zoomeye
+
+[https://www.zoomeye.org/](https://www.zoomeye.org/)
+
+#### Fofa
+
+[https://fofa.so/](https://fofa.so/)
+
+#### Riskiq
+
+[https://www.riskiq.com/](https://www.riskiq.com/)
+
+#### 在线查询
+
+[http://tool.chinaz.com/subdomain/](http://tool.chinaz.com/subdomain/)
+
+[http://www.yumingco.com/sub/](http://www.yumingco.com/sub/)
+
+[https://securitytrails.com/list/apex\_domain/qq.com](https://securitytrails.com/list/apex_domain/qq.com)
+
+[https://findsubdomains.com/](https://findsubdomains.com/)
+
+[http://ce.baidu.com/index/getRelatedSites?site\_address=qq.com](http://ce.baidu.com/index/getRelatedSites?site_address=qq.com)
+
+[https://dnslytics.com/](https://dnslytics.com/)
+
+### 域名备案搜集资产
+
+在对一些大型的目标进行信息搜集时，还可以通过查找域名备案信息来发现同备案的其他域名资产。如搜集百度的子域名时，最常见的即为对baidu.com进行子域名搜集，此时就会遗漏其余顶级域名资产。
+
+[http://beianbeian.com/](http://beianbeian.com/)
+
+### 自身泄露
+
+流量代理：通过[WebProxy](https://github.com/FeeiCN/WebProxy)代理电脑所有流量，再分析流量中中出现的子域名
+
+```text
+域名跳转记录中的子域名
+Response中存在的子域名
+网络请求资源中的子域名
+```
+
+### 置换扫描
+
+置换扫描是另一种识别子域名的有趣技术。在这种技术中，我们使用已经已知的域名或子域名的排列、变更和突变来识别新的子域名
+
+![1563867265863](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867265863.png)
+
+使用AltDNS查找到与特定置换或修改匹配的子域名
+
+### 自制系统号
+
+找到自治系统号将帮助我们识别属于一个组织的网段，这个组织中可能有有效的域名。
+
+1. 使用dig或host解析给定域名的IP地址。
+2. 提供IP地址就可以找到ASN的工具
+
+   [https://asn.cymru.com/cgi-bin/whois.cgi](https://asn.cymru.com/cgi-bin/whois.cgi)
+
+3. 提供域名就可以找到ASN的工具
+
+   [http://bgp.he.net/](http://bgp.he.net/)
+
+4. 发现的ASN编号可以用来查找域名的网段。有Nmap脚本可以实现
+
+   [https://nmap.org/nsedoc/scripts/targets-asn.html](https://nmap.org/nsedoc/scripts/targets-asn.html)
+
+   `nmap --script targets-asn --script-args targets-asn.asn=17012 > netblocks.txt`
+
+### 区域传送
+
+区域传送是DNS事务的一种类型，DNS服务器将一个完整或部分的区域文件副本传递给另一个DNS服务器。如果区域传送没有被安全地配置，任何人都可以在服务器上启动区域传送，并获得该区域文件的副本。而区域文件包含了许多关于该区域和驻留在该区域的主机的信息。
+
+![1563867533113](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867533113.png)
+
+### DNSSEC
+
+由于在DNSSEC中处理不存在的域名，所以可以遍历DNSSEC区域并枚举该区域中的所有域名。对于使用NSEC记录的DNSSEC区域，可以使用像ldns-walk这样的工具来执行区域遍历。
+
+![1563867616602](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563867616602.png)
+
+一些DNSSEC区域使用NSEC3记录，这些[**记录**](javascript:;)使用散列的域名来防止攻击者收集纯文本域名。攻击者可以收集所有的子域散列，并在离线状态下解密。
+
+nsec3walker、nsec3map等工具帮助我们自动收集NSEC3散列和破解散列。安装nsec3walker后，可以使用以下指令枚举NSEC3受保护区域的子域名。
+
+```text
+# Collect NSEC3 hashes of a domain
+　　$ ./collect icann.org > icann.org.collect
+　　# Undo the hashing, expose the sub-domain information.
+　　$ ./unhash < icann.org.collect > icann.org.unhash
+　　# Listing only the sub-domain part from the unhashed data
+　　$ cat icann.org.unhash | grep "icann" | awk '{print $2;}'
+　　del.icann.org.
+　　access.icann.org.
+　　charts.icann.org.
+　　communications.icann.org.
+　　fellowship.icann.org.
+　　files.icann.org.
+　　forms.icann.org.
+　　mail.icann.org.
+　　maintenance.icann.org.
+　　new.icann.org.
+　　public.icann.org.
+　　research.icann.org.
+```
+
+### 工具集合
+
+#### theHarvester
+
+[https://github.com/laramies/theHarvester](https://github.com/laramies/theHarvester)
+
+这里要介绍的另一款开源情报收集工具就是theHarvester，它可以寻找出与目标域名有关的电子邮箱地址、子域名和虚拟主机。但是与Sublist3r相比，它所能提供的子域名查询结果十分有限。
+
+`python theHarvester.py -d example.com -b all`
+
+#### Smart Dns Brute-Forcer
+
+[https://github.com/jfrancois/SDBF](https://github.com/jfrancois/SDBF)
+
+子域名枚举工具中通常都包含有一个需要进行尝试解析的常见子域名列表，而我们可以利用马尔可夫链的知识来扩展这种技术。例如当你查找到了www1之后，也许www2也会存在，以此类推。这篇研究论文对这项技术进行了非常详细的介绍，而SDBF的查询结果要比简单的关键字枚举技术丰富得多。
+
+#### sublist3r
+
+集合了多种搜索引擎的接口。
+
+[https://github.com/aboul3la/Sublist3r](https://github.com/aboul3la/Sublist3r)
+
+![1563859164957](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563859164957-3929913.png)
+
+#### subDomainsBrute
+
+[https://github.com/lijiejie/subDomainsBrute](https://github.com/lijiejie/subDomainsBrute)
+
+![1563860976671](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563860976671-3929916.png)
+
+#### pyspider
+
+[https://github.com/binux/pyspider](https://github.com/binux/pyspider)
+
+爬虫工具
+
+#### subjs
+
+[https://github.com/lc/subjs](https://github.com/lc/subjs)
+
+#### linkfinder
+
+[https://github.com/GerbenJavado/LinkFinder](https://github.com/GerbenJavado/LinkFinder)
+
+#### **wydomain**
+
+[https://github.com/ring04h/wydomain](https://github.com/ring04h/wydomain)
+
+字典穷举
+
+`python dnsburte.py -d aliyun.com -f dnspod.csv -o aliyun.log`
+
+#### DNSMaper
+
+域传送检测/子域名枚举/Banner检测/生成地图
+
+`https://github.com/le4f/dnsmaper`
+
+#### Orangescan
+
+资产发现管理，域名信息关联（whois、github历史泄露）、漏洞扫描
+
+[https://github.com/0xbug/orangescan](https://github.com/0xbug/orangescan)
+
+#### subdomain-bruteforcer \(SubBrute\)
+
+[https://github.com/TheRook/subbrute](https://github.com/TheRook/subbrute)
+
+根据Dns记录查询子域名
+
+#### GoogleSSLdomainFinder
+
+[https://github.com/We5ter/GSDF](https://github.com/We5ter/GSDF)
+
+GoogleSSLdomainFinder是为方便使用[谷歌透明证书查询](https://transparencyreport.google.com/https/certificates)的python脚本，而使用谷歌透明证书查询子域名准确率较高，但覆盖面不足。
+
+#### Cloudflare Enumeration Tool v1.2
+
+[https://github.com/mandatoryprogrammer/cloudflare\_enum](https://github.com/mandatoryprogrammer/cloudflare_enum)
+
+使用CloudFlare进行子域名枚举的脚本
+
+#### Domain scan
+
+[https://github.com/18F/domain-scan](https://github.com/18F/domain-scan)
+
+#### Knock Subdomain Scan
+
+[https://github.com/guelfoweb/knock](https://github.com/guelfoweb/knock)
+
+![1563866043951](https://echocipher.github.io/2019/07/24/Subdomain-Recon/1563866043951.png)
+
+#### DomainSeeker
+
+[https://github.com/exp-db/PythonPool/tree/master/Tools/DomainSeeker](https://github.com/exp-db/PythonPool/tree/master/Tools/DomainSeeker)
+
+#### BroDomain
+
+[https://github.com/code-scan/BroDomain](https://github.com/code-scan/BroDomain)
+
+```text
+brodomain.py
+|---输入域名
+|    |---查询域名注册邮箱
+|    |---通过域名查询备案号
+|    |---通过备案号查询域名
+|    |---反查注册邮箱
+|    |---反查注册人
+|    |---通过注册人查询到的域名在查询邮箱
+|    |---通过上一步邮箱去查询域名
+|    |---查询以上获取出的域名的子域名
+|    \---结束
+\---生成html和log报告
+```
+
+#### DnsBrute
+
+[https://github.com/Q2h1Cg/dnsbrute](https://github.com/Q2h1Cg/dnsbrute)
+
+#### subdomain3
+
+[https://github.com/yanxiu0614/subdomain3/](https://github.com/yanxiu0614/subdomain3/)
+
+Sublist3r是最受欢迎的开源工具之一，同时支持Python 2.x和Python 3.x版本。除常见搜索引擎外，Sublist3r还使用Netcraft、Virustotal、ThreatCrowd、DNSdumpster和ReverseDNS枚举子域名。
+
+#### ESD
+
+[https://github.com/FeeiCN/ESD](https://github.com/FeeiCN/ESD)
+
+**ESD枚举工具**可基于aioHTTP获取一个不存在子域名的响应内容，并将其与字典子域名响应进行相似度对比（超过阈值为同个页面，低于阀值则为可用子域名），最后再对最终子域名进行响应相似度对比。该工具可以有效避免搜集到的子域名大部分为无效子域名。
+
+#### Layer子域名挖掘机
+
+#### WFuzz
+
+#### **bugcrowd-levelup-subdomain-enumeration**
+
+[https://github.com/appsecco/bugcrowd-levelup-subdomain-enumeration](https://github.com/appsecco/bugcrowd-levelup-subdomain-enumeration)
+
+简化使用CT日志搜索引擎查找子域名的过程，在子域名枚举中使用CT的缺点是，在CT日志中找到的域名可能不再存在，因此它们不能被解析为IP地址。可以使用诸如massdns这样与CT日志结合的工具来快速识别可解析的域名
+
+#### **dnsrecon**
+
+[https://github.com/darkoperator/dnsrecon](https://github.com/darkoperator/dnsrecon)
+
+DNSRecon是一个功能强大的DNS枚举工具，它的功能之一是使用预定义的词表进行基于词典的子域名枚举。
+
+#### Altdns
+
+[https://github.com/infosec-au/altdns](https://github.com/infosec-au/altdns)
+
+置换扫描是另一种识别子域名的有趣技术。在这种技术中，我们使用已经已知的域名或子域名的排列、变更和突变来识别新的子域名
+
+`./dnsrecon.py -d <domain>`
+
+#### Teemo
+
+具有相关域名搜集能力，即会收集当前域名所在组织的其他域名。原理是通过证书中"Subject Alternative Name"的内容。
+
+```text
+利用搜索引擎：
+
+    http://www.ask.com/ （无请求限制，需要代理）
+    https://www.baidu.com/ （无请求限制，不需要代理）
+    http://cn.bing.com/
+    https://api.cognitive.microsoft.com （bing API 尚未完成）
+    http://www.dogpile.com/ （无需代理）
+    https://duckduckgo.com （尚未完成，页面控制）
+    http://www.exalead.com/search/web/
+    http://www.fofa.so/ （需要购买）
+    https://www.so.com/
+    https://www.google.com （可能被block，需要代理）
+    https://search.yahoo.com/
+    https://yandex.com/ （可能被block）
+    http://www.exalead.com/ （可能被block）
+    http://www.googleapis.com/ （需要API key，google CSE）
+    https://www.zoomeye.org/
+    https://shodan.io/
+
+利用第三方站点：
+
+    Alexa
+    Chaxunla
+    CrtSearch
+    DNSdumpster
+    Googlect
+    Ilink
+    Netcraft
+    PassiveDNS
+    Pgpsearch
+    Sitedossier
+    ThreatCrowd
+    Threatminer
+    Virustotal
+    HackerTarget
+
+whois查询及反向查询(接口需付费,暂未加入到主功能当中)：
+
+    https://www.whoxy.com/
+    DOMAINTOOLS
+    WHOISXMLAPI
+    ROBOWHOIS
+    ZIPWHOIS
+
+利用枚举
+
+    subDomainsBrute https://github.com/lijiejie/subDomainsBrute
+
+各API申请指引(非必要)
+
+其中部分接口需要API Key，如果有相应账号，可以在config.py中进行配置，没有也不影响程序的使用。
+
+Google CSE(自定义搜索引擎):
+
+    创建自定义的搜索引擎（CSE）https://cse.google.com/cse/all
+    申请API Key: https://developers.google.com/custom-search/json-api/v1/overview
+
+Bing API:
+
+    https://azure.microsoft.com/zh-cn/try/cognitive-services/my-apis/
+    https://api.cognitive.microsoft.com/bing/v5.0/search
+    https://docs.microsoft.com/en-us/azure/cognitive-services/bing-web-search/quick-start
+
+Fofa:
+
+    需要购买会员
+
+Shodan:
+
+    登陆后页面右上角“show API key”
+```
+
+#### CTFR
+
+[https://github.com/UnaPibaGeek/ctfr](https://github.com/UnaPibaGeek/ctfr)
+
+Certificate Transparency日志查询工具
+
+`python3 ctfr.py -d facebook.com -o /home/shei/subdomains_fb.txt`
+
+#### Domain Hunter
+
+[https://github.com/bit4woo/domain\_hunter](https://github.com/bit4woo/domain_hunter)
+
+当使用了BurpSuite作为代理，或者使用它进行了安全测试，会就会记录相关的域名。其中，某个目标的子域名和相似域名很有价值，尤其是相似域名，往往有惊喜！插件的主要原理就是从BurpSuite的Sitemap中搜索出子域名和相似域名。也可以对已经发现的子域名进行主动爬取，以发现更多的相关域名，这个动作可以自己重复递归下去，直到没有新的域名发现为止。
+
+#### kali
+
+在kali linux下有dnsenum、dnsmap、dnsrecon、dnstracer、dnswalk、fierce、urlcrazy共七个dns信息收集工具
+
+**Dnsenum**
+
+[https://github.com/fwaeytens/dnsenum](https://github.com/fwaeytens/dnsenum)
+
+dnsenum的目的是尽可能收集一个域的信息，它能够通过谷歌或者字典文件猜测可能存在的域名，以及对一个网段进行反向查询。它可以查询网站的主机地址信息、域名服务器、mx record（函件交换记录），在域名服务器上执行axfr请求，通过谷歌脚本得到扩展域名信息（google hacking），提取子域名并查询，计算C类地址并执行whois查询，执行反向查询，把地址段写入文件。
+
+`./dnsenum.pl -f dns.txt baidu.com`
+
+**dnsmap**
+
+用来收集信息和枚举DNS信息，dnsmap暴力破解子域名信息，需要字典配合，速度比较快。
+
+[https://github.com/makefu/dnsmap](https://github.com/makefu/dnsmap)
+
+**fierce**
+
+测试区域传输漏洞和子域名暴力破解
+
+`fierce -dns blog.csdn.net -wordlist myDNSwordlist.txt`
+
+**urlcrazy**
+
+Typo域名是一类的特殊域名。用户将正确的域名错误拼写产生的域名被称为Typo域名。例如，[http://www.baidu.com错误拼写为http://www.bidu.com，就形成一个Typo域名。对于热门网站的Typo域名会产生大量的访问量，通常都会被人抢注，以获取流量。而黑客也会利用Typo域名构建钓鱼网站。Kali](http://www.baidu.com错误拼写为http://www.bidu.com，就形成一个Typo域名。对于热门网站的Typo域名会产生大量的访问量，通常都会被人抢注，以获取流量。而黑客也会利用Typo域名构建钓鱼网站。Kali) Linux提供对应的检测工具urlcrazy，该工具统计了常见的几百种拼写错误。它可以根据用户输入的域名，自动生成Typo域名；并且会检验这些域名是否被使用，从而发现潜在的风险。同时，它还会统计这些域名的热度，从而分析危害程度。
+
+`urlcrazy [选项] domain`
+

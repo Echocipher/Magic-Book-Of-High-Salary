@@ -8,4 +8,6 @@
   * [渗透测试](trick-tree/pentest/README.md)
     * [OWASP TOP 10](trick-tree/pentest/owasp-top-10.md)
     * [信息泄露](trick-tree/pentest/information-leakage.md)
+  * [信息收集](trick-tree/information-collect/README.md)
+    * [子域名信息收集](trick-tree/information-collect/subdomain-recon.md)
 
