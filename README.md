@@ -6,13 +6,13 @@ description: 一本自用“魔法书”，总结trick，所学习知识均来�
 
 ## 作者
 
-Echocipher
+**Echocipher**
 
-Computer science and Technology Bachelor of Hebei University of Technology
+> Computer science and Technology Bachelor of Hebei University of Technology
 
-**职位：**渗透测试工程师
+**职位：渗透测试工程师**
 
-**联系方式：**echocipher@163.com
+**联系方式：echocipher@163.com**
 
 ## 起因
 
