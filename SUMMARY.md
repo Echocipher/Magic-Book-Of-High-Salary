@@ -11,4 +11,5 @@
       * [信息收集](trick-tree/pentest/information-leakage/information-collect/README.md)
         * [子域名信息收集](trick-tree/pentest/information-leakage/information-collect/subdomain-recon.md)
         * [端口信息收集](trick-tree/pentest/information-leakage/information-collect/port-scan.md)
+        * [其他信息收集](trick-tree/pentest/information-leakage/information-collect/qi-ta-xin-xi-shou-ji.md)
 
