@@ -20,7 +20,7 @@ description: 一本自用“魔法书”，总结trick，所学习知识均来�
 
 > 一切资源请合理使用，本文档只作为总结学习使用
 
-为了您更好的阅读体验，请访问[GitBook](https://394103765.gitbook.io/magic-book-of-high-salary/) 阅读（需墙）。
+为了您更好的阅读体验，请访问[点击这里](https://394103765.gitbook.io/magic-book-of-high-salary/)打开GitBook 阅读，手机用户请点击左上方展开菜单。
 
 ### 说明
 
