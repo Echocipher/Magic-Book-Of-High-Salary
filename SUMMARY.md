@@ -13,5 +13,5 @@
         * [端口信息收集](trick-tree/pentest/information-leakage/information-collect/port-scan.md)
         * [其他信息收集](trick-tree/pentest/information-leakage/information-collect/qi-ta-xin-xi-shou-ji.md)
       * [常规漏洞](trick-tree/pentest/information-leakage/regular-vulnerability/README.md)
-        * [SQL注入](trick-tree/pentest/information-leakage/regular-vulnerability/sql-zhu-ru.md)
+        * [SQL注入](trick-tree/pentest/information-leakage/regular-vulnerability/sql-inject.md)
 
