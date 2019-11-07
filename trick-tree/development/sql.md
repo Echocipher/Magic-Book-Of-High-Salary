@@ -268,7 +268,7 @@ SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 3;
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2835%29.png)
+![](../../.gitbook/assets/tu-pian%20%2836%29.png)
 
 通常，使用聚合查询时，我们应该给列名设置一个别名，便于处理结果：
 
@@ -301,7 +301,7 @@ SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 3;
 
 我们可以看到， `GROUP BY`子句指定了按`class_id`分组，因此，执行该`SELECT`语句时，会把`class_id`相同的列先分组，再分别计算，因此，得到了3行结果。
 
-![](../../.gitbook/assets/tu-pian%20%2831%29.png)
+![](../../.gitbook/assets/tu-pian%20%2832%29.png)
 
 ### 多表查询
 
@@ -344,7 +344,7 @@ LEFT OUTER JOIN是选出左表存在的记录
 
 RIGHT OUTER JOIN是选出右表存在的记录：
 
-![](../../.gitbook/assets/tu-pian%20%2838%29.png)
+![](../../.gitbook/assets/tu-pian%20%2839%29.png)
 
 FULL OUTER JOIN则是选出左右表都存在的记录
 
