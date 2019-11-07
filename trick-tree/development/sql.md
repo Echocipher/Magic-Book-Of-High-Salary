@@ -12,15 +12,15 @@ description: 总结数据库相关知识
 
 层次模型是按上下级的层次关系来组织数据的一种方式。
 
-![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2836%29.png)
+![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2840%29.png)
 
 网状模型是把每个数据节点和其他很多节点连接起来。
 
-![&#x7F51;&#x72B6;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%288%29.png)
+![&#x7F51;&#x72B6;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2811%29.png)
 
 关系模型把数据看作一个二位表格，任何数据都可以通过行列号来确定。
 
-![&#x5173;&#x7CFB;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2820%29.png)
+![&#x5173;&#x7CFB;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2823%29.png)
 
 ### 数据类型
 
@@ -106,7 +106,10 @@ SQL定义了如下操作数据库的能力：
 在一个数据表中，通过一个字段可以把数据与另一张表关联起来，这种列成为外键，外键不是通过列名实现的，而是通过定义外键约束实现的。
 
 ```text
-ALTER TABLE studentsADD CONSTRAINT fk_class_idFOREIGN KEY (class_id)REFERENCES classes (id);
+ALTER TABLE students
+ADD CONSTRAINT fk_class_id
+FOREIGN KEY (class_id)
+REFERENCES classes (id);
 ```
 
 其中，外键约束的名称`fk_class_id`可以任意，`FOREIGN KEY (class_id)`指定了`class_id`作为外键，`REFERENCES classes (id)`指定了这个外键将关联到`classes`表的`id`列（即`classes`表的主键）。
@@ -116,7 +119,8 @@ ALTER TABLE studentsADD CONSTRAINT fk_class_idFOREIGN KEY (class_id)REFERENCES c
 如果我们想删除一个外键约束我们可以利用`ALTER TABLE` 实现
 
 ```text
-ALTER TABLE studentsDROP FOREIGN KEY fk_class_id;
+ALTER TABLE students
+DROP FOREIGN KEY fk_class_id;
 ```
 
 这里注意，删除外键约束并没有删除外键这一列，删除列是通过`DROP COLUMN` 实现的。
@@ -136,13 +140,15 @@ ALTER TABLE studentsDROP FOREIGN KEY fk_class_id;
 如果要经常根据`score`列进行查询，就可以对`score`列创建索引：
 
 ```text
-ALTER TABLE studentsADD INDEX idx_score (score);
+ALTER TABLE students
+ADD INDEX idx_score (score);
 ```
 
 使用`ADD INDEX idx_score (score)`就创建了一个名称为`idx_score`，使用列`score`的索引。索引名称是任意的，索引如果有多列，可以在括号里依次写上，例如：
 
 ```text
-ALTER TABLE studentsADD INDEX idx_name_score (name, score);
+ALTER TABLE students
+ADD INDEX idx_name_score (name, score);
 ```
 
 索引的效率取决于索引列的值是否`散列`，即该列的值如果越互不相同，那么索引效率越高。反过来，如果记录的列存在大量相同的值，例如`gender`列，大约一半的记录值是`M`，另一半是`F`，因此，对该列创建索引就没有意义。
@@ -158,7 +164,8 @@ ALTER TABLE studentsADD INDEX idx_name_score (name, score);
 但是，这些列根据业务要求，又具有唯一性约束：即不能出现两条记录存储了同一个身份证号。这个时候，就可以给该列添加一个唯一索引。例如，我们假设`students`表的`name`不能重复：
 
 ```text
-ALTER TABLE studentsADD UNIQUE INDEX uni_name (name);
+ALTER TABLE students
+ADD UNIQUE INDEX uni_name (name);
 ```
 
 通过`UNIQUE`关键字我们就添加了一个唯一索引。
@@ -166,7 +173,8 @@ ALTER TABLE studentsADD UNIQUE INDEX uni_name (name);
 也可以只对某一列添加一个唯一约束而不创建唯一索引：
 
 ```text
-ALTER TABLE studentsADD CONSTRAINT uni_name UNIQUE (name);
+ALTER TABLE students
+ADD CONSTRAINT uni_name UNIQUE (name);
 ```
 
 这种情况下，`name`列没有索引，但仍然具有唯一性保证。
@@ -179,7 +187,7 @@ ALTER TABLE studentsADD CONSTRAINT uni_name UNIQUE (name);
 
 其中`SELECT` 是关键字，代表执行一个查询，`*` 表示所有列，`FROM` 表示从哪个表查询，查询结果是一个二维表，`SELECT` 不仅可以查询，还可以做运算。
 
-![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2832%29.png)
+![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2836%29.png)
 
 `SELECT` 还可以判断当前到数据库的连接是否有效，许多检测工具会执行一条`SELECT 1;` 来测试数据库的连接性。
 
@@ -232,7 +240,10 @@ ALTER TABLE studentsADD CONSTRAINT uni_name UNIQUE (name);
 如果有`WHERE`子句，那么`ORDER BY`子句要放到`WHERE`子句后面。例如，查询一班的学生成绩，并按照倒序排序：
 
 ```text
-SELECT id, name, gender, scoreFROM studentsWHERE class_id = 1ORDER BY score DESC;
+SELECT id, name, gender, score
+FROM students
+WHERE class_id = 1
+ORDER BY score DESC;
 ```
 
 ### 分页
@@ -242,13 +253,19 @@ SELECT id, name, gender, scoreFROM studentsWHERE class_id = 1ORDER BY score DESC
 例如我们要将下列语句查询的结果分页，每页`3` 条记录，取第`1`页数据。要注意的是索引从`0` 开始。
 
 ```text
-SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 0;
+SELECT id, name, gender, score
+FROM students
+ORDER BY score DESC
+LIMIT 3 OFFSET 0;
 ```
 
 如果我们想取第`2` 页的数据，我们只需要跳过第一页的三条记录即可，也就是跳过`0` 、`1` 、`2` ，所以我们将`OFFSET` 设定为`3` 即可。
 
 ```text
-SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 3;
+SELECT id, name, gender, score
+FROM students
+ORDER BY score DESC
+LIMIT 3 OFFSET 3;
 ```
 
 注意的是，`LIMIT 3` 表示的是最多3条记录，如果某页数据量不够3条会按照实际数量显示。
@@ -268,13 +285,13 @@ SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 3;
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2850%29.png)
+![](../../.gitbook/assets/tu-pian%20%2855%29.png)
 
 通常，使用聚合查询时，我们应该给列名设置一个别名，便于处理结果：
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2818%29.png)
+![](../../.gitbook/assets/tu-pian%20%2821%29.png)
 
 聚合查询同样可以使用`WHERE`条件，因此我们可以方便地统计出有多少男生、多少女生、多少80分以上的学生等：
 
@@ -301,7 +318,7 @@ SELECT id, name, gender, scoreFROM studentsORDER BY score DESCLIMIT 3 OFFSET 3;
 
 我们可以看到， `GROUP BY`子句指定了按`class_id`分组，因此，执行该`SELECT`语句时，会把`class_id`相同的列先分组，再分别计算，因此，得到了3行结果。
 
-![](../../.gitbook/assets/tu-pian%20%2845%29.png)
+![](../../.gitbook/assets/tu-pian%20%2850%29.png)
 
 ### 多表查询
 
@@ -336,21 +353,21 @@ SELECT ... FROM tableA ??? JOIN tableB ON tableA.column1 = tableB.column2;
 
 我们把tableA看作左表，把tableB看成右表，那么INNER JOIN是选出两张表都存在的记录
 
-![](../../.gitbook/assets/tu-pian%20%2812%29.png)
+![](../../.gitbook/assets/tu-pian%20%2815%29.png)
 
 LEFT OUTER JOIN是选出左表存在的记录
 
-![](../../.gitbook/assets/tu-pian%20%289%29.png)
+![](../../.gitbook/assets/tu-pian%20%2812%29.png)
 
 RIGHT OUTER JOIN是选出右表存在的记录：
 
-![](../../.gitbook/assets/tu-pian%20%2854%29.png)
+![](../../.gitbook/assets/tu-pian%20%2859%29.png)
 
 FULL OUTER JOIN则是选出左右表都存在的记录
 
 
 
-![](../../.gitbook/assets/tu-pian%20%2831%29.png)
+![](../../.gitbook/assets/tu-pian%20%2835%29.png)
 
 ### 插入数据
 
@@ -395,7 +412,18 @@ DELETE FROM <表名> WHERE ...;
 列出所有数据库：
 
 ```text
-mysql> SHOW DATABASES;+--------------------+| Database           |+--------------------+| information_schema || mysql              || performance_schema || shici              || sys                || test               || school             |+--------------------+
+mysql> SHOW DATABASES;
++--------------------+
+| Database           |
++--------------------+
+| information_schema |
+| mysql              |
+| performance_schema |
+| shici              |
+| sys                |
+| test               |
+| school             |
++--------------------+
 ```
 
  其中，`information_schema`、`mysql`、`performance_schema`和`sys`是系统库，不要去改动它们。其他的是用户创建的数据库。
@@ -403,13 +431,15 @@ mysql> SHOW DATABASES;+--------------------+| Database           |+-------------
 创建新的数据库：
 
 ```text
-mysql> CREATE DATABASE test;Query OK, 1 row affected (0.01 sec)
+mysql> CREATE DATABASE test;
+Query OK, 1 row affected (0.01 sec)
 ```
 
 删除数据库：
 
 ```text
-mysql> DROP DATABASE test;Query OK, 0 rows affected (0.01 sec)
+mysql> DROP DATABASE test;
+Query OK, 0 rows affected (0.01 sec)
 ```
 
 注意：删除一个数据库将导致该数据库的所有表全部被删除。
@@ -417,31 +447,62 @@ mysql> DROP DATABASE test;Query OK, 0 rows affected (0.01 sec)
 对一个数据库进行操作时，要首先将其切换为当前数据库：
 
 ```text
-mysql> USE test;Database changed
+mysql> USE test;
+Database changed
 ```
 
 列出当前数据库的所有表，使用命令：
 
 ```text
-mysql> SHOW TABLES;+---------------------+| Tables_in_test      |+---------------------+| classes             || statistics          || students            || students_of_class1  |+---------------------+
+mysql> SHOW TABLES;
++---------------------+
+| Tables_in_test      |
++---------------------+
+| classes             |
+| statistics          |
+| students            |
+| students_of_class1  |
++---------------------+
 ```
 
 要查看一个表的结构，使用命令：
 
 ```text
-mysql> DESC students;+----------+--------------+------+-----+---------+----------------+| Field    | Type         | Null | Key | Default | Extra          |+----------+--------------+------+-----+---------+----------------+| id       | bigint(20)   | NO   | PRI | NULL    | auto_increment || class_id | bigint(20)   | NO   |     | NULL    |                || name     | varchar(100) | NO   |     | NULL    |                || gender   | varchar(1)   | NO   |     | NULL    |                || score    | int(11)      | NO   |     | NULL    |                |+----------+--------------+------+-----+---------+----------------+5 rows in set (0.00 sec)
+mysql> DESC students;
++----------+--------------+------+-----+---------+----------------+
+| Field    | Type         | Null | Key | Default | Extra          |
++----------+--------------+------+-----+---------+----------------+
+| id       | bigint(20)   | NO   | PRI | NULL    | auto_increment |
+| class_id | bigint(20)   | NO   |     | NULL    |                |
+| name     | varchar(100) | NO   |     | NULL    |                |
+| gender   | varchar(1)   | NO   |     | NULL    |                |
+| score    | int(11)      | NO   |     | NULL    |                |
++----------+--------------+------+-----+---------+----------------+
+5 rows in set (0.00 sec)
 ```
 
 还可以使用以下命令查看创建表的SQL语句：
 
 ```text
-mysql> SHOW CREATE TABLE students;+----------+-------------------------------------------------------+| students | CREATE TABLE `students` (                             ||          |   `id` bigint(20) NOT NULL AUTO_INCREMENT,            ||          |   `class_id` bigint(20) NOT NULL,                     ||          |   `name` varchar(100) NOT NULL,                       ||          |   `gender` varchar(1) NOT NULL,                       ||          |   `score` int(11) NOT NULL,                           ||          |   PRIMARY KEY (`id`)                                  ||          | ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 |+----------+-------------------------------------------------------+1 row in set (0.00 sec)
+mysql> SHOW CREATE TABLE students;
++----------+-------------------------------------------------------+
+| students | CREATE TABLE `students` (                             |
+|          |   `id` bigint(20) NOT NULL AUTO_INCREMENT,            |
+|          |   `class_id` bigint(20) NOT NULL,                     |
+|          |   `name` varchar(100) NOT NULL,                       |
+|          |   `gender` varchar(1) NOT NULL,                       |
+|          |   `score` int(11) NOT NULL,                           |
+|          |   PRIMARY KEY (`id`)                                  |
+|          | ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8 |
++----------+-------------------------------------------------------+
+1 row in set (0.00 sec)
 ```
 
 创建表使用`CREATE TABLE`语句，而删除表使用`DROP TABLE`语句：
 
 ```text
-mysql> DROP TABLE students;Query OK, 0 rows affected (0.01 sec)
+mysql> DROP TABLE students;
+Query OK, 0 rows affected (0.01 sec)
 ```
 
 修改表就比较复杂。如果要给`students`表新增一列`birth`，使用：
@@ -467,7 +528,8 @@ ALTER TABLE students DROP COLUMN birthday;
 使用`EXIT`命令退出MySQL：
 
 ```text
-mysql> EXITBye
+mysql> EXIT
+Bye
 ```
 
 注意`EXIT`仅仅断开了客户端和服务器的连接，MySQL服务器仍然继续运行。
@@ -509,7 +571,8 @@ INSERT IGNORE INTO students (id, class_id, name, gender, score) VALUES (1, 1, '�
 如果想要对一个表进行快照，即复制一份当前表的数据到一个新表，可以结合`CREATE TABLE`和`SELECT`：
 
 ```text
--- 对class_id=1的记录进行快照，并存储为新表students_of_class1:CREATE TABLE students_of_class1 SELECT * FROM students WHERE class_id=1;
+-- 对class_id=1的记录进行快照，并存储为新表students_of_class1:
+CREATE TABLE students_of_class1 SELECT * FROM students WHERE class_id=1;
 ```
 
 新创建的表结构和`SELECT`使用的表结构完全一致。
@@ -521,7 +584,12 @@ INSERT IGNORE INTO students (id, class_id, name, gender, score) VALUES (1, 1, '�
 例如，创建一个统计成绩的表`statistics`，记录各班的平均成绩：
 
 ```text
-CREATE TABLE statistics (    id BIGINT NOT NULL AUTO_INCREMENT,    class_id BIGINT NOT NULL,    average DOUBLE NOT NULL,    PRIMARY KEY (id));
+CREATE TABLE statistics (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    class_id BIGINT NOT NULL,
+    average DOUBLE NOT NULL,
+    PRIMARY KEY (id)
+);
 ```
 
 然后，我们就可以用一条语句写入各班的平均成绩：
@@ -533,7 +601,15 @@ INSERT INTO statistics (class_id, average) SELECT class_id, AVG(score) FROM stud
 确保`INSERT`语句的列和`SELECT`语句的列能一一对应，就可以在`statistics`表中直接保存查询的结果：
 
 ```text
-> select * from statistics;+----+----------+--------------+| id | class_id | average      |+----+----------+--------------+|  1 |        1 |         86.5 ||  2 |        2 | 73.666666666 ||  3 |        3 | 88.333333333 |+----+----------+--------------+3 rows in set (0.00 sec)
+> select * from statistics;
++----+----------+--------------+
+| id | class_id | average      |
++----+----------+--------------+
+|  1 |        1 |         86.5 |
+|  2 |        2 | 73.666666666 |
+|  3 |        3 | 88.333333333 |
++----+----------+--------------+
+3 rows in set (0.00 sec)
 ```
 
 ### 事务
@@ -541,7 +617,11 @@ INSERT INTO statistics (class_id, average) SELECT class_id, AVG(score) FROM stud
 在执行SQL语句的时候，某些业务要求，一系列操作必须全部执行，而不能仅执行一部分。例如，一个转账操作：
 
 ```text
--- 从id=1的账户给id=2的账户转账100元-- 第一步：将id=1的A账户余额减去100UPDATE accounts SET balance = balance - 100 WHERE id = 1;-- 第二步：将id=2的B账户余额加上100UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+-- 从id=1的账户给id=2的账户转账100元
+-- 第一步：将id=1的A账户余额减去100
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+-- 第二步：将id=2的B账户余额加上100
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
 ```
 
 这两条SQL语句必须全部执行，或者，由于某些原因，如果第一条语句成功，第二条语句失败，就必须全部撤销。
@@ -560,7 +640,10 @@ INSERT INTO statistics (class_id, average) SELECT class_id, AVG(score) FROM stud
 要手动把多条SQL语句作为一个事务执行，使用`BEGIN`开启一个事务，使用`COMMIT`提交一个事务，这种事务被称为_显式事务_，例如，把上述的转账操作作为一个显式事务：
 
 ```text
-BEGIN;UPDATE accounts SET balance = balance - 100 WHERE id = 1;UPDATE accounts SET balance = balance + 100 WHERE id = 2;COMMIT;
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT;
 ```
 
 很显然多条SQL语句要想作为一个事务执行，就必须使用显式事务。
@@ -570,7 +653,10 @@ BEGIN;UPDATE accounts SET balance = balance - 100 WHERE id = 1;UPDATE accounts S
 有些时候，我们希望主动让事务失败，这时，可以用`ROLLBACK`回滚事务，整个事务会失败：
 
 ```text
-BEGIN;UPDATE accounts SET balance = balance - 100 WHERE id = 1;UPDATE accounts SET balance = balance + 100 WHERE id = 2;ROLLBACK;
+BEGIN;
+UPDATE accounts SET balance = balance - 100 WHERE id = 1;
+UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+ROLLBACK;
 ```
 
 数据库事务是由数据库系统保证的，我们只需要根据业务逻辑使用它就可以。
@@ -597,7 +683,13 @@ Read Uncommitted是隔离级别最低的一种事务级别。在这种隔离级�
 首先，我们准备好`students`表的数据，该表仅一行记录：
 
 ```text
-mysql> select * from students;+----+-------+| id | name  |+----+-------+|  1 | Alice |+----+-------+1 row in set (0.00 sec)
+mysql> select * from students;
++----+-------+
+| id | name  |
++----+-------+
+|  1 | Alice |
++----+-------+
+1 row in set (0.00 sec)
 ```
 
 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
@@ -629,7 +721,13 @@ mysql> select * from students;+----+-------+| id | name  |+----+-------+|  1 | A
 我们仍然先准备好`students`表的数据：
 
 ```text
-mysql> select * from students;+----+-------+| id | name  |+----+-------+|  1 | Alice |+----+-------+1 row in set (0.00 sec)
+mysql> select * from students;
++----+-------+
+| id | name  |
++----+-------+
+|  1 | Alice |
++----+-------+
+1 row in set (0.00 sec)
 ```
 
 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
@@ -655,7 +753,13 @@ mysql> select * from students;+----+-------+| id | name  |+----+-------+|  1 | A
 我们仍然先准备好`students`表的数据：
 
 ```text
-mysql> select * from students;+----+-------+| id | name  |+----+-------+|  1 | Alice |+----+-------+1 row in set (0.00 sec)
+mysql> select * from students;
++----+-------+
+| id | name  |
++----+-------+
+|  1 | Alice |
++----+-------+
+1 row in set (0.00 sec)
 ```
 
 然后，分别开启两个MySQL客户端连接，按顺序依次执行事务A和事务B：
