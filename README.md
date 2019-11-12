@@ -14,7 +14,7 @@ description: 一本自用“魔法书”，总结trick，所学习知识均来�
 
 **联系方式：echocipher@163.com**
 
-**Blog：**[**https://www.echocipher.life**](https://www.echocipher.life)\*\*\*\*
+**Blog：**[**https://www.echocipher.life**](https://www.echocipher.life)
 
 ## 起因
 
