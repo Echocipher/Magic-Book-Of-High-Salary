@@ -12,7 +12,7 @@ description: 总结数据库相关知识
 
 层次模型是按上下级的层次关系来组织数据的一种方式。
 
-![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2850%29.png)
+![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2852%29.png)
 
 网状模型是把每个数据节点和其他很多节点连接起来。
 
@@ -187,7 +187,7 @@ ADD CONSTRAINT uni_name UNIQUE (name);
 
 其中`SELECT` 是关键字，代表执行一个查询，`*` 表示所有列，`FROM` 表示从哪个表查询，查询结果是一个二维表，`SELECT` 不仅可以查询，还可以做运算。
 
-![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2846%29.png)
+![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2848%29.png)
 
 `SELECT` 还可以判断当前到数据库的连接是否有效，许多检测工具会执行一条`SELECT 1;` 来测试数据库的连接性。
 
@@ -285,7 +285,7 @@ LIMIT 3 OFFSET 3;
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2865%29.png)
+![](../../.gitbook/assets/tu-pian%20%2869%29.png)
 
 通常，使用聚合查询时，我们应该给列名设置一个别名，便于处理结果：
 
@@ -318,7 +318,7 @@ LIMIT 3 OFFSET 3;
 
 我们可以看到， `GROUP BY`子句指定了按`class_id`分组，因此，执行该`SELECT`语句时，会把`class_id`相同的列先分组，再分别计算，因此，得到了3行结果。
 
-![](../../.gitbook/assets/tu-pian%20%2860%29.png)
+![](../../.gitbook/assets/tu-pian%20%2864%29.png)
 
 ### 多表查询
 
@@ -361,13 +361,13 @@ LEFT OUTER JOIN是选出左表存在的记录
 
 RIGHT OUTER JOIN是选出右表存在的记录：
 
-![](../../.gitbook/assets/tu-pian%20%2869%29.png)
+![](../../.gitbook/assets/tu-pian%20%2873%29.png)
 
 FULL OUTER JOIN则是选出左右表都存在的记录
 
 
 
-![](../../.gitbook/assets/tu-pian%20%2844%29.png)
+![](../../.gitbook/assets/tu-pian%20%2846%29.png)
 
 ### 插入数据
 
