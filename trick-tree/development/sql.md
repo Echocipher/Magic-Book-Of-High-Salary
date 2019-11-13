@@ -12,15 +12,15 @@ description: 总结数据库相关知识
 
 层次模型是按上下级的层次关系来组织数据的一种方式。
 
-![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2861%29.png)
+![&#x5C42;&#x6B21;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2865%29.png)
 
 网状模型是把每个数据节点和其他很多节点连接起来。
 
-![&#x7F51;&#x72B6;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2818%29.png)
+![&#x7F51;&#x72B6;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2820%29.png)
 
 关系模型把数据看作一个二位表格，任何数据都可以通过行列号来确定。
 
-![&#x5173;&#x7CFB;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2835%29.png)
+![&#x5173;&#x7CFB;&#x6A21;&#x578B;](../../.gitbook/assets/tu-pian%20%2837%29.png)
 
 ### 数据类型
 
@@ -85,7 +85,7 @@ SQL定义了如下操作数据库的能力：
 1. 自增整数类型：数据库会在插入数据时自动为每一条记录分配一个自增整数，这样我们就完全不用担心主键重复，也不用自己预先生成主键；
 2. 全局唯一GUID类型：使用一种全局唯一的字符串作为主键，类似`8f55d96b-8acc-4636-8cb8-76bf8abc2f57`。GUID算法通过网卡MAC地址、时间戳和随机数保证任意计算机在任意时间生成的字符串都是不同的，大部分编程语言都内置了GUID算法，可以自己预算出主键。
 
- 对于大部分应用来说，通常自增类型的主键就能满足需求。我们在`students`表中定义的主键也是`BIGINT NOT NULL AUTO_INCREMENT`类型。
+   对于大部分应用来说，通常自增类型的主键就能满足需求。我们在`students`表中定义的主键也是`BIGINT NOT NULL AUTO_INCREMENT`类型。
 
 ### 联合主键
 
@@ -183,17 +183,17 @@ ADD CONSTRAINT uni_name UNIQUE (name);
 
 ### 基本查询
 
-`SELECT * FROM <表名>` 
+`SELECT * FROM <表名>`
 
 其中`SELECT` 是关键字，代表执行一个查询，`*` 表示所有列，`FROM` 表示从哪个表查询，查询结果是一个二维表，`SELECT` 不仅可以查询，还可以做运算。
 
-![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2856%29.png)
+![SELECT 100+200](../../.gitbook/assets/tu-pian%20%2858%29.png)
 
 `SELECT` 还可以判断当前到数据库的连接是否有效，许多检测工具会执行一条`SELECT 1;` 来测试数据库的连接性。
 
 ### 条件查询
 
-`SELECT * FROM <表名> WHERE <条件表达式>`  
+`SELECT * FROM <表名> WHERE <条件表达式>`
 
 条件表达式可以用`<条件1> AND <条件2>` 表达多个条件的`与` 关系，同理，也可以使用`OR` 表示`或` 关系，也可以用`NOT` 表示`非` ，其中`NOT A=2` 等价于`A<>2` 。
 
@@ -203,7 +203,7 @@ ADD CONSTRAINT uni_name UNIQUE (name);
 
 ### 优先级
 
- 如果不加括号，条件运算按照`NOT`、`AND`、`OR`的优先级进行，即`NOT`优先级最高，其次是`AND`，最后是`OR`。加上括号可以改变优先级。
+如果不加括号，条件运算按照`NOT`、`AND`、`OR`的优先级进行，即`NOT`优先级最高，其次是`AND`，最后是`OR`。加上括号可以改变优先级。
 
 ### 常用的条件表达式
 
@@ -221,17 +221,17 @@ ADD CONSTRAINT uni_name UNIQUE (name);
 
 我们可以通过指定列名的方式来指定返回某些列的数据，而不是所有数据。
 
- `SELECT 列1, 列2, 列3 FROM ...` 
+`SELECT 列1, 列2, 列3 FROM ...`
 
 同时我们也可以给每一列起一个别名，这样得到的结果集的列名就可以和原表的列名不同。
 
- `SELECT 列1 别名1, 列2 别名2, 列3 别名3 FROM ...`
+`SELECT 列1 别名1, 列2 别名2, 列3 别名3 FROM ...`
 
 ### 排序
 
 我们可以使用`order by` 子句对结果排序，会按照我们指定的参数从低到高进行排序，如果我们想要从高到低排序，我们可以加上`DESC` 表示倒序。
 
-`SELECT id, name, gender, score FROM students ORDER BY score DESC;` 
+`SELECT id, name, gender, score FROM students ORDER BY score DESC;`
 
 如果`score` 列中有相同数据，我们想要进一步排序，可以继续添加列名，例如， 使用`ORDER BY score DESC, gender`表示先按`score`列倒序，如果有相同分数的，再按`gender`列排序。
 
@@ -277,21 +277,21 @@ LIMIT 3 OFFSET 3;
 
 这样就能正确查询出第N页的记录集。
 
-`LIMIT` 如果设定的值超过了查询的最大数量，并不会报错，而是会得到一个空的结果集，如果没有写`OFFSET` ，例如，`LIMIT 15`  等价于`LIMIT 15 OFFSET 0` ，在MySQL中，`LIMIT 15 OFFSET 30` 可以简写为`LIMIT 30,15` 。 使用`LIMIT <M> OFFSET <N>`分页时，随着`N`越来越大，查询效率也会越来越低。
+`LIMIT` 如果设定的值超过了查询的最大数量，并不会报错，而是会得到一个空的结果集，如果没有写`OFFSET` ，例如，`LIMIT 15` 等价于`LIMIT 15 OFFSET 0` ，在MySQL中，`LIMIT 15 OFFSET 30` 可以简写为`LIMIT 30,15` 。 使用`LIMIT <M> OFFSET <N>`分页时，随着`N`越来越大，查询效率也会越来越低。
 
 ### 聚合查询
 
- `COUNT(*)`表示查询所有列的行数，要注意聚合的计算结果虽然是一个数字，但查询的结果仍然是一个二维表，只是这个二维表只有一行一列，并且列名是`COUNT(*)`
+`COUNT(*)`表示查询所有列的行数，要注意聚合的计算结果虽然是一个数字，但查询的结果仍然是一个二维表，只是这个二维表只有一行一列，并且列名是`COUNT(*)`
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2883%29.png)
+![](../../.gitbook/assets/tu-pian%20%2888%29.png)
 
 通常，使用聚合查询时，我们应该给列名设置一个别名，便于处理结果：
 
 `SELECT COUNT(*) num FROM students;`
 
-![](../../.gitbook/assets/tu-pian%20%2833%29.png)
+![](../../.gitbook/assets/tu-pian%20%2835%29.png)
 
 聚合查询同样可以使用`WHERE`条件，因此我们可以方便地统计出有多少男生、多少女生、多少80分以上的学生等：
 
@@ -308,7 +308,7 @@ LIMIT 3 OFFSET 3;
 
 注意，`MAX()`和`MIN()`函数并不限于数值类型。如果是字符类型，`MAX()`和`MIN()`会返回排序最后和排序最前的字符。
 
- 要特别注意：如果聚合查询的`WHERE`条件没有匹配到任何行，`COUNT()`会返回0，而`SUM()`、`AVG()`、`MAX()`和`MIN()`会返回`NULL`
+要特别注意：如果聚合查询的`WHERE`条件没有匹配到任何行，`COUNT()`会返回0，而`SUM()`、`AVG()`、`MAX()`和`MIN()`会返回`NULL`
 
 ### 分组
 
@@ -318,11 +318,11 @@ LIMIT 3 OFFSET 3;
 
 我们可以看到， `GROUP BY`子句指定了按`class_id`分组，因此，执行该`SELECT`语句时，会把`class_id`相同的列先分组，再分别计算，因此，得到了3行结果。
 
-![](../../.gitbook/assets/tu-pian%20%2877%29.png)
+![](../../.gitbook/assets/tu-pian%20%2882%29.png)
 
 ### 多表查询
 
- `SELECT * FROM <表1> <表2>`
+`SELECT * FROM <表1> <表2>`
 
 这样一次查询两个表的数据，查询的结果也是一个二维表，他是表1和表2的乘积，即表1的每一行与表2的每一行两两拼到一起返回，列数是表1和表2的`和`，行数是表1和表2 的`积` 。
 
@@ -339,11 +339,11 @@ LIMIT 3 OFFSET 3;
 3. 然后确定连接条件，使用`ON <条件...>`，这里的条件是`s.class_id = c.id`，表示`students`表的`class_id`列与`classes`表的`id`列相同的行需要连接；
 4. 可选：加上`WHERE`子句、`ORDER BY`等子句。
 
- `RIGHT OUTER JOIN`，返回右表都存在的行。如果某一行仅在右表存在，那么结果集就会以`NULL`填充剩下的字段。
+   `RIGHT OUTER JOIN`，返回右表都存在的行。如果某一行仅在右表存在，那么结果集就会以`NULL`填充剩下的字段。
 
- `LEFT OUTER JOIN`，返回左表都存在的行。如果我们给students表增加一行，并添加class\_id=5，由于classes表并不存在id=5的行，所以，LEFT OUTER JOIN的结果会增加一行，对应的`class_name`是`NULL`
+   `LEFT OUTER JOIN`，返回左表都存在的行。如果我们给students表增加一行，并添加class\_id=5，由于classes表并不存在id=5的行，所以，LEFT OUTER JOIN的结果会增加一行，对应的`class_name`是`NULL`
 
-`FULL OUTER JOIN`，它会把两张表的所有记录全部选择出来，并且，自动把对方不存在的列填充为`NULL` 
+`FULL OUTER JOIN`，它会把两张表的所有记录全部选择出来，并且，自动把对方不存在的列填充为`NULL`
 
 对于这么多种JOIN查询，到底什么使用应该用哪种呢？其实我们用图来表示结果集就一目了然了，假设查询语句是
 
@@ -353,21 +353,19 @@ SELECT ... FROM tableA ??? JOIN tableB ON tableA.column1 = tableB.column2;
 
 我们把tableA看作左表，把tableB看成右表，那么INNER JOIN是选出两张表都存在的记录
 
-![](../../.gitbook/assets/tu-pian%20%2823%29.png)
+![](../../.gitbook/assets/tu-pian%20%2825%29.png)
 
 LEFT OUTER JOIN是选出左表存在的记录
 
-![](../../.gitbook/assets/tu-pian%20%2819%29.png)
+![](../../.gitbook/assets/tu-pian%20%2821%29.png)
 
 RIGHT OUTER JOIN是选出右表存在的记录：
 
-![](../../.gitbook/assets/tu-pian%20%2888%29.png)
+![](../../.gitbook/assets/tu-pian%20%2893%29.png)
 
 FULL OUTER JOIN则是选出左右表都存在的记录
 
-
-
-![](../../.gitbook/assets/tu-pian%20%2854%29.png)
+![](../../.gitbook/assets/tu-pian%20%2856%29.png)
 
 ### 插入数据
 
@@ -383,7 +381,7 @@ INSERT INTO <表名> (字段1, 字段2, ...) VALUES (值1, 值2, ...);
 PDATE <表名> SET 字段1=值1, 字段2=值2, ... WHERE ...;
 ```
 
- `UPDATE`语句的`WHERE`条件和`SELECT`语句的`WHERE`条件其实是一样的，因此完全可以一次更新多条记录。
+`UPDATE`语句的`WHERE`条件和`SELECT`语句的`WHERE`条件其实是一样的，因此完全可以一次更新多条记录。
 
 `UPDATE students SET name='小牛', score=77 WHERE id>=5 AND id<=7;`
 
@@ -391,13 +389,13 @@ PDATE <表名> SET 字段1=值1, 字段2=值2, ... WHERE ...;
 
 如果`WHERE`条件没有匹配到任何记录，`UPDATE`语句不会报错，也不会有任何记录被更新。
 
- `UPDATE`语句可以没有`WHERE`条件，例如：
+`UPDATE`语句可以没有`WHERE`条件，例如：
 
 ```text
 UPDATE students SET score=60;
 ```
 
- 这时，整个表的所有记录都会被更新。所以，在执行`UPDATE`语句时要非常小心，最好先用`SELECT`语句来测试`WHERE`条件是否筛选出了期望的记录集，然后再用`UPDATE`更新。
+这时，整个表的所有记录都会被更新。所以，在执行`UPDATE`语句时要非常小心，最好先用`SELECT`语句来测试`WHERE`条件是否筛选出了期望的记录集，然后再用`UPDATE`更新。
 
 ### 删除数据
 
@@ -405,7 +403,7 @@ UPDATE students SET score=60;
 DELETE FROM <表名> WHERE ...;
 ```
 
- `DELETE`语句的`WHERE`条件也是用来筛选需要删除的行，因此和`UPDATE`类似，`DELETE`语句也可以一次删除多条记录， 如果`WHERE`条件没有匹配到任何记录，`DELETE`语句不会报错，也不会有任何记录被删除，和`UPDATE`类似，不带`WHERE`条件的`DELETE`语句会删除整个表的数据。
+`DELETE`语句的`WHERE`条件也是用来筛选需要删除的行，因此和`UPDATE`类似，`DELETE`语句也可以一次删除多条记录， 如果`WHERE`条件没有匹配到任何记录，`DELETE`语句不会报错，也不会有任何记录被删除，和`UPDATE`类似，不带`WHERE`条件的`DELETE`语句会删除整个表的数据。
 
 ### MySQL
 
@@ -426,7 +424,7 @@ mysql> SHOW DATABASES;
 +--------------------+
 ```
 
- 其中，`information_schema`、`mysql`、`performance_schema`和`sys`是系统库，不要去改动它们。其他的是用户创建的数据库。
+其中，`information_schema`、`mysql`、`performance_schema`和`sys`是系统库，不要去改动它们。其他的是用户创建的数据库。
 
 创建新的数据库：
 
@@ -742,7 +740,7 @@ mysql> select * from students;
 | 6 |  | SELECT \* FROM students WHERE id = 1; |
 | 7 |  | COMMIT; |
 
- 当事务B第一次执行第3步的查询时，得到的结果是`Alice`，随后，由于事务A在第4步更新了这条记录并提交，所以，事务B在第6步再次执行同样的查询时，得到的结果就变成了`Bob`，因此，在Read Committed隔离级别下，事务不可重复读同一条记录，因为很可能读到的结果不一致。
+当事务B第一次执行第3步的查询时，得到的结果是`Alice`，随后，由于事务A在第4步更新了这条记录并提交，所以，事务B在第6步再次执行同样的查询时，得到的结果就变成了`Bob`，因此，在Read Committed隔离级别下，事务不可重复读同一条记录，因为很可能读到的结果不一致。
 
 **Repeatable Read**
 
@@ -792,7 +790,7 @@ Serializable是最严格的隔离级别。在Serializable隔离级别下，所�
 
 ## 参考资料
 
-1. [SQL教程](**%5B**https://www.liaoxuefeng.com/wiki/1177760294764384**%5D%28https://www.liaoxuefeng.com/wiki/1177760294764384%29**)
+1. [SQL教程](https://github.com/Echocipher/Magic-Book-Of-High-Salary/tree/2296c80f23e9602d03b15ada82f82ef4204f1969/trick-tree/development/**[**https:/www.liaoxuefeng.com/wiki/1177760294764384**]%28https:/www.liaoxuefeng.com/wiki/1177760294764384%29**/README.md)
 
 \*\*\*\*
 
